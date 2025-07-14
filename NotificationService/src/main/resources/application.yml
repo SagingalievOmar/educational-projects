@@ -1,0 +1,59 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: NotificationService
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: user
+    password: 1234
+    virtual-host: /
+
+    listener:
+      simple:
+        missing-queues-fatal: false
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/my_database
+    username: user
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/2025/06/10-01-changelog.sql
+    contexts: development
+    drop-first: false
+    default-schema: public
+    liquibase-schema: public
+    database-change-log-lock-table: DATABASECHANGELOGLOCK
+    database-change-log-table: DATABASECHANGELOG
+
+exchanges:
+  direct: taskFlow.direct.exchange
+  fanout: taskFlow.fanout.exchange
+  topic: taskFlow.topic.exchange
+  DLX: dead.letter.exchange
+
+queues:
+  notifications: task.notifications
+  audit-fanout: task.audit.fanout
+  audit-topic: task.notifications.topic
+  error: task.error.topic
+
+routing-keys:
+  dl-routing-key: dead.letter
+  direct-rk: task.notifications
+  audit-topic: task.*
+  error-topic: error.*
